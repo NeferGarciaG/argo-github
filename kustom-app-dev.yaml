@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kustom-app-dev
+  namespace: argocd
+  labels:
+    env: dev
+  annotations:
+    # Suscripción válida al servicio webhook 'github-dispatch'
+    notifications.argoproj.io/subscribe.on-healthy-synced.github-dispatch: ""
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/NeferGarciaG/argo-github.git
+    targetRevision: main
+    path: overlays/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
