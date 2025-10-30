@@ -8,7 +8,7 @@ spec:
     spec: # Pod spec
       containers:
       - name: mycontainer
-        image: "nggarciag/workshop:1.0.0"
+        image: "nggarciag/workshop:latest"
         ports:
         - containerPort: 80
         envFrom:
