@@ -8,14 +8,13 @@ metadata:
   labels:
     env: dev
   annotations:
-    # Suscripción válida al servicio webhook 'github-dispatch'
     notifications.argoproj.io/subscribe.on-healthy-synced.github-dispatch: ""
 spec:
   project: default
   source:
     repoURL: https://github.com/NeferGarciaG/argo-github.git
-    targetRevision: main
-    path: overlays/dev
+    targetRevision: main   # puedes usar HEAD si prefieres
+    path: kustom-webapp/overlays/dev  # <—— ESTA es la clave
   destination:
     server: https://kubernetes.default.svc
     namespace: dev
