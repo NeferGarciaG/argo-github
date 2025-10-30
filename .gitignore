@@ -1,1 +1,1 @@
-argocd-notifications-secret.yaml
+argo/apps/argocd-notifications-secret.yaml
