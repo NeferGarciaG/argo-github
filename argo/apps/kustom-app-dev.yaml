@@ -13,8 +13,8 @@ spec:
   project: default
   source:
     repoURL: https://github.com/NeferGarciaG/argo-github.git
-    targetRevision: main   # puedes usar HEAD si prefieres
-    path: kustom-webapp/overlays/dev  # <—— ESTA es la clave
+    targetRevision: main   # HEAD
+    path: kustom-webapp/overlays/dev  # path
   destination:
     server: https://kubernetes.default.svc
     namespace: dev
