@@ -10,7 +10,7 @@ metadata:
   annotations:
     # notifications.argoproj.io/subscribe.on-healthy-synced.github-dispatch: ""
     # notifications.argoproj.io/subscribe.on-deployed-dispatch.github-dispatch: ""
-    notifications.argoproj.io/subscribe.on-deployed-dispatch.webhook: github-dispatch
+    notifications.argoproj.io/subscribe.on-deployed-dispatch.webhook: ""
     notify.github.owner: NeferGarciaG
     notify.github.repo: trigger-repo
     notify.github.event_type: argo_deploy 
