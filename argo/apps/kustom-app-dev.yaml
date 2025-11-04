@@ -1,4 +1,29 @@
-#kustom-app-dev.yaml
+# #kustom-app-dev.yaml
+
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: kustom-app-dev
+#   namespace: argocd
+#   labels:
+#     env: dev
+#   annotations:
+#     # notifications.argoproj.io/subscribe.on-healthy-synced.github-dispatch: ""
+#     notifications.argoproj.io/subscribe.on-deployed-dispatch.github-dispatch: ""
+
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://github.com/NeferGarciaG/argo-github.git
+#     targetRevision: main   # HEAD
+#     path: kustom-webapp/overlays/dev  # path
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: dev
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
 
 apiVersion: argoproj.io/v1alpha1
 kind: Application
@@ -8,19 +33,19 @@ metadata:
   labels:
     env: dev
   annotations:
-    # notifications.argoproj.io/subscribe.on-healthy-synced.github-dispatch: ""
-    # notifications.argoproj.io/subscribe.on-deployed-dispatch.github-dispatch: ""
-    notifications.argoproj.io/subscribe.on-deployed-dispatch.webhook: ""
+    # Suscripción: trigger=on-deployed-dispatch, service=webhook, recipient=github-dispatch
+    notifications.argoproj.io/subscribe.on-deployed-dispatch.webhook: github-dispatch
+
+    # Parametrización obligatoria del destino
     notify.github.owner: NeferGarciaG
     notify.github.repo: trigger-repo
-    notify.github.event_type: argo_deploy 
-
+    notify.github.event_type: argo_deploy
 spec:
   project: default
   source:
     repoURL: https://github.com/NeferGarciaG/argo-github.git
-    targetRevision: main   # HEAD
-    path: kustom-webapp/overlays/dev  # path
+    targetRevision: main
+    path: kustom-webapp/overlays/dev
   destination:
     server: https://kubernetes.default.svc
     namespace: dev
@@ -28,5 +53,4 @@ spec:
     automated:
       prune: true
       selfHeal: true
-
-
+ 

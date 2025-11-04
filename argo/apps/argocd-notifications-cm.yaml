@@ -49,6 +49,7 @@ data:
   context: |
     argocdUrl: https://localhost:8080
 
+  # Servicio webhook "github-dispatch"
   service.webhook.github-dispatch: |
     url: https://api.github.com
     headers:
@@ -61,9 +62,10 @@ data:
     - name: Content-Type
       value: application/json
 
+  # Mensaje (plantilla) que arma el payload y el path usando anotaciones obligatorias
   template.dispatch-repo-event: |
-    {{- $owner := (or (index .app.metadata.annotations "notify.github.owner") .context.defaultGithubOwner) -}}
-    {{- $repo  := (or (index .app.metadata.annotations "notify.github.repo")  .context.defaultGithubRepo)  -}}
+    {{- $owner := required "missing annotation: notify.github.owner" (index .app.metadata.annotations "notify.github.owner") -}}
+    {{- $repo  := required "missing annotation: notify.github.repo"  (index .app.metadata.annotations "notify.github.repo")  -}}
     {{- $etype := (or (index .app.metadata.annotations "notify.github.event_type") "argo_deploy") -}}
 
     webhook:
@@ -80,10 +82,9 @@ data:
           ) -}}
           {{ toJson $payload }}
 
+  # Trigger robusto: Synced + Healthy; una vez por cada revision para evitar duplicados
   trigger.on-deployed-dispatch: |
-    - when: app.status.operationState != nil
-            && app.status.operationState.phase == 'Succeeded'
-            && app.status.health.status == 'Healthy'
+    - when: app.status.sync.status == 'Synced' && app.status.health.status == 'Healthy'
       oncePer: app.status.sync.revision
       send: [dispatch-repo-event]
  
