@@ -108,10 +108,10 @@ data:
     webhook:
       github-dispatch:
         method: POST
-        path: /repos/{{ default "NeferGarciaG" (index .app.metadata.annotations "notify.github.owner") }}/{{ default "trigger-repo" (index .app.metadata.annotations "notify.github.repo") }}/dispatches
+        path: /repos/{{ index .app.metadata.annotations "notify.github.owner" }}/{{ index .app.metadata.annotations "notify.github.repo" }}/dispatches
         body: |
-          {{- $eventType := default "argo_deploy" (index .app.metadata.annotations "notify.github.event_type") -}}
-          {{- $env := default "unknown" (index .app.metadata.labels "env") -}}
+          {{- $eventType := index .app.metadata.annotations "notify.github.event_type" -}}
+          {{- $env := index .app.metadata.labels "env" -}}
           {{- $payload := dict "event_type" $eventType "client_payload" (dict
                 "app" .app.metadata.name
                 "env" $env
