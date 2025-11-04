@@ -77,9 +77,9 @@ data:
           {{ toJson $payload }}
 
   trigger.on-deployed-dispatch: |
-    - when: app.status.operationState != nil
-            && app.status.operationState.phase == 'Succeeded'
-            && app.status.health.status == 'Healthy'
+    - when: app.status.operationState.phase == 'Succeeded' &&
+            app.status.sync.status == 'Synced' &&
+            app.status.health.status == 'Healthy'
       oncePer: app.status.sync.revision
       send: [dispatch-repo-event]
 
