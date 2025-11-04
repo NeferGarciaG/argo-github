@@ -34,7 +34,7 @@ metadata:
     env: dev
   annotations:
     # Suscripción: trigger=on-deployed-dispatch, service=webhook, recipient=github-dispatch
-    notifications.argoproj.io/subscribe.on-deployed-dispatch.webhook: github-dispatch
+    notifications.argoproj.io/subscribe.on-deployed-dispatch.webhook: ""
 
     # Parametrización obligatoria del destino
     notify.github.owner: NeferGarciaG
