@@ -3,5 +3,5 @@ kind: Deployment
 metadata:
   name: mywebapp
 spec:
-  replicas: 8
+  replicas: 1
 
