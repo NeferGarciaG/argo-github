@@ -49,40 +49,28 @@ data:
   context: |
     argocdUrl: https://localhost:8080
 
-  # Servicio webhook "github-dispatch"
   service.webhook.github-dispatch: |
     url: https://api.github.com
     headers:
-    - name: Authorization
-      value: Bearer $github-token
-    - name: Accept
-      value: application/vnd.github+json
-    - name: X-GitHub-Api-Version
-      value: 2022-11-28
-    - name: Content-Type
-      value: application/json
+      - name: Authorization
+        value: Bearer $github-token
+      - name: Accept
+        value: application/vnd.github+json
+      - name: X-GitHub-Api-Version
+        value: 2022-11-28
+      - name: Content-Type
+        value: application/json
 
-  # Mensaje (plantilla) que arma el payload y el path usando anotaciones obligatorias
+  # Plantilla SIN directivas a tope: primero YAML válido, luego Go template dentro del body
   template.dispatch-repo-event: |
-    {{- $owner := required "missing annotation: notify.github.owner" (index .app.metadata.annotations "notify.github.owner") -}}
-    {{- $repo  := required "missing annotation: notify.github.repo"  (index .app.metadata.annotations "notify.github.repo")  -}}
-    {{- $etype := (or (index .app.metadata.annotations "notify.github.event_type") "argo_deploy") -}}
-
     webhook:
       github-dispatch:
         method: POST
-        path: /repos/{{$owner}}/{{$repo}}/dispatches
+        path: /repos/{{ index .app.metadata.annotations "notify.github.owner" }}/{{ index .app.metadata.annotations "notify.github.repo" }}/dispatches
         body: |
-          {{- $payload := dict "event_type" $etype "client_payload" (dict
-                "app" .app.metadata.name
-                "env" (index .app.metadata.labels "env")
-                "revision" .app.status.sync.revision
-                "health" .app.status.health.status
-                "argo_link" (printf "%s/applications/%s/%s" .context.argocdUrl .app.metadata.namespace .app.metadata.name)
-          ) -}}
-          {{ toJson $payload }}
+          {{- $etype := (or (index .app.metadata.annotations "notify.github.event_type") "argo_deploy") -}}
+          {{- printf "{\"event_type\":\"%s\",\"client_payload\":{\"app\":\"%s\",\"env\":\"%s\",\"revision\":\"%s\",\"health\":\"%s\",\"argo_link\":\"%s/applications/%s/%s\"}}" $etype .app.metadata.name (index .app.metadata.labels "env") .app.status.sync.revision .app.status.health.status .context.argocdUrl .app.metadata.namespace .app.metadata.name -}}
 
-  # Trigger robusto: Synced + Healthy; una vez por cada revision para evitar duplicados
   trigger.on-deployed-dispatch: |
     - when: app.status.sync.status == 'Synced' && app.status.health.status == 'Healthy'
       oncePer: app.status.sync.revision
