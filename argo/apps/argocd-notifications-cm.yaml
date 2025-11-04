@@ -61,7 +61,6 @@ data:
       - name: Content-Type
         value: application/json
 
-  # Plantilla SIN directivas a tope: primero YAML válido, luego Go template dentro del body
   template.dispatch-repo-event: |
     webhook:
       github-dispatch:
@@ -71,8 +70,12 @@ data:
           {{- $etype := (or (index .app.metadata.annotations "notify.github.event_type") "argo_deploy") -}}
           {{- printf "{\"event_type\":\"%s\",\"client_payload\":{\"app\":\"%s\",\"env\":\"%s\",\"revision\":\"%s\",\"health\":\"%s\",\"argo_link\":\"%s/applications/%s/%s\"}}" $etype .app.metadata.name (index .app.metadata.labels "env") .app.status.sync.revision .app.status.health.status .context.argocdUrl .app.metadata.namespace .app.metadata.name -}}
 
+  # ⬇️ Nuevo trigger: espera a que la operación haya Succeeded y deduplica por (revision + finishedAt)
   trigger.on-deployed-dispatch: |
-    - when: app.status.sync.status == 'Synced' && app.status.health.status == 'Healthy'
-      oncePer: app.status.sync.revision
+    - when: app.status.operationState.phase == 'Succeeded' &&
+            app.status.sync.status == 'Synced' &&
+            app.status.health.status == 'Healthy'
+      oncePer: "{{ printf \"%s|%s\" .app.status.sync.revision .app.status.operationState.finishedAt }}"
       send: [dispatch-repo-event]
+
  
