@@ -65,9 +65,7 @@ data:
     webhook:
       github-dispatch:
         method: POST
-        {{- $owner := or (index .app.metadata.annotations "notify.github.owner") (fail "notify.github.owner annotation is required") -}}
-        {{- $repo := or (index .app.metadata.annotations "notify.github.repo") (fail "notify.github.repo annotation is required") -}}
-        path: /repos/{{ $owner }}/{{ $repo }}/dispatches
+        path: /repos/{{ or (index .app.metadata.annotations "notify.github.owner") (fail "notify.github.owner annotation is required") }}/{{ or (index .app.metadata.annotations "notify.github.repo") (fail "notify.github.repo annotation is required") }}/dispatches
         body: |
           {{- $eventType := default "argo_deploy" (index .app.metadata.annotations "notify.github.event_type") -}}
           {{- $payload := dict "event_type" $eventType "client_payload" (dict
