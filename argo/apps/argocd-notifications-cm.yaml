@@ -67,8 +67,14 @@ data:
         method: POST
         path: /repos/{{ index .app.metadata.annotations "notify.github.owner" }}/{{ index .app.metadata.annotations "notify.github.repo" }}/dispatches
         body: |
-          {{- $etype := (or (index .app.metadata.annotations "notify.github.event_type") "argo_deploy") -}}
-          {{- printf "{\"event_type\":\"%s\",\"client_payload\":{\"app\":\"%s\",\"env\":\"%s\",\"revision\":\"%s\",\"health\":\"%s\",\"argo_link\":\"%s/applications/%s/%s\"}}" $etype .app.metadata.name (index .app.metadata.labels "env") .app.status.sync.revision .app.status.health.status .context.argocdUrl .app.metadata.namespace .app.metadata.name -}}
+          {{- $payload := dict "event_type" "argo_deploy" "client_payload" (dict
+                "app" .app.metadata.name
+                "env" (index .app.metadata.labels "env")
+                "revision" .app.status.sync.revision
+                "health" .app.status.health.status
+                "argo_link" (printf "%s/applications/%s/%s" .context.argocdUrl .app.metadata.namespace .app.metadata.name)
+          ) -}}
+          {{ toJson $payload }}
 
   trigger.on-deployed-dispatch: |
     - when: app.status.operationState != nil
