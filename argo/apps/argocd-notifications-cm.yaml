@@ -42,6 +42,49 @@
 
 # #argo-notifications-cm.yaml
 
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: argocd-notifications-cm
+#   namespace: argocd
+# data:
+#   context: |
+#     argocdUrl: https://localhost:8080
+#   service.webhook.github-dispatch: |
+#     url: https://api.github.com
+#     headers:
+#     - name: Authorization
+#       value: Bearer $github-token
+#     - name: Accept
+#       value: application/vnd.github+json
+#     - name: X-GitHub-Api-Version
+#       value: 2022-11-28
+#     - name: Content-Type
+#       value: application/json
+#   template.dispatch-repo-event: |
+#     webhook:
+#       github-dispatch:
+#         method: POST
+#         path: /repos/{{ or (index .app.metadata.annotations "notify.github.owner") (fail "notify.github.owner annotation is required") }}/{{ or (index .app.metadata.annotations "notify.github.repo") (fail "notify.github.repo annotation is required") }}/dispatches
+#         body: |
+#           {{- $eventType := default "argo_deploy" (index .app.metadata.annotations "notify.github.event_type") -}}
+#           {{- $payload := dict "event_type" $eventType "client_payload" (dict
+#                 "app" .app.metadata.name
+#                 "env" (default "unknown" (index .app.metadata.labels "env"))
+#                 "revision" .app.status.sync.revision
+#                 "health" .app.status.health.status
+#                 "argo_link" (printf "%s/applications/%s/%s" .context.argocdUrl .app.metadata.namespace .app.metadata.name)
+#           ) -}}
+#           {{ toJson $payload }}
+#   trigger.on-deployed-dispatch: |
+#     - when: app.status.operationState != nil
+#             && app.status.operationState.phase == 'Succeeded'
+#             && app.status.health.status == 'Healthy'
+#       oncePer: app.status.sync.revision
+#       send: [dispatch-repo-event]
+
+# #argo-notifications-cm.yaml
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -65,12 +108,11 @@ data:
     webhook:
       github-dispatch:
         method: POST
-        path: /repos/{{ or (index .app.metadata.annotations "notify.github.owner") (fail "notify.github.owner annotation is required") }}/{{ or (index .app.metadata.annotations "notify.github.repo") (fail "notify.github.repo annotation is required") }}/dispatches
+        path: /repos/NeferGarciaG/trigger-repo/dispatches
         body: |
-          {{- $eventType := default "argo_deploy" (index .app.metadata.annotations "notify.github.event_type") -}}
-          {{- $payload := dict "event_type" $eventType "client_payload" (dict
+          {{- $payload := dict "event_type" "argo_deploy" "client_payload" (dict
                 "app" .app.metadata.name
-                "env" (default "unknown" (index .app.metadata.labels "env"))
+                "env" (index .app.metadata.labels "env")
                 "revision" .app.status.sync.revision
                 "health" .app.status.health.status
                 "argo_link" (printf "%s/applications/%s/%s" .context.argocdUrl .app.metadata.namespace .app.metadata.name)
@@ -82,3 +124,5 @@ data:
             && app.status.health.status == 'Healthy'
       oncePer: app.status.sync.revision
       send: [dispatch-repo-event]
+
+#argo-notifications-cm.yaml

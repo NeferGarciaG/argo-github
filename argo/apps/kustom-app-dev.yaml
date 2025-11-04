@@ -25,6 +25,38 @@
 #       prune: true
 #       selfHeal: true
 
+# #kustom-app-dev.yaml
+
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: kustom-app-dev
+#   namespace: argocd
+#   labels:
+#     env: dev
+#   annotations:
+#     # Suscripción al webhook github-dispatch cuando la app está sincronizada y saludable
+#     notifications.argoproj.io/subscribe.on-deployed-dispatch.webhook: github-dispatch
+
+#     # Repositorio GitHub que recibirá el evento repository_dispatch
+#     notify.github.owner: NeferGarciaG
+#     notify.github.repo: trigger-repo
+#     notify.github.event_type: argo_deploy
+
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://github.com/NeferGarciaG/argo-github.git
+#     targetRevision: main   # HEAD
+#     path: kustom-webapp/overlays/dev  # path
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: dev
+#   syncPolicy:
+#     automated:
+#       prune: true
+#       selfHeal: true
+
 #kustom-app-dev.yaml
 
 apiVersion: argoproj.io/v1alpha1
@@ -35,13 +67,8 @@ metadata:
   labels:
     env: dev
   annotations:
-    # Suscripción al webhook github-dispatch cuando la app está sincronizada y saludable
-    notifications.argoproj.io/subscribe.on-deployed-dispatch.webhook: github-dispatch
-
-    # Repositorio GitHub que recibirá el evento repository_dispatch
-    notify.github.owner: NeferGarciaG
-    notify.github.repo: trigger-repo
-    notify.github.event_type: argo_deploy
+    # notifications.argoproj.io/subscribe.on-healthy-synced.github-dispatch: ""
+    notifications.argoproj.io/subscribe.on-deployed-dispatch.github-dispatch: ""
 
 spec:
   project: default
