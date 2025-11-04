@@ -8,7 +8,9 @@ metadata:
   labels:
     env: dev
   annotations:
-    notifications.argoproj.io/subscribe.on-healthy-synced.github-dispatch: ""
+    # notifications.argoproj.io/subscribe.on-healthy-synced.github-dispatch: ""
+    notifications.argoproj.io/subscribe.on-deployed-dispatch.github-dispatch: ""
+ 
 spec:
   project: default
   source:
