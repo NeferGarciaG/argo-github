@@ -71,10 +71,10 @@ data:
           {{- printf "{\"event_type\":\"%s\",\"client_payload\":{\"app\":\"%s\",\"env\":\"%s\",\"revision\":\"%s\",\"health\":\"%s\",\"argo_link\":\"%s/applications/%s/%s\"}}" $etype .app.metadata.name (index .app.metadata.labels "env") .app.status.sync.revision .app.status.health.status .context.argocdUrl .app.metadata.namespace .app.metadata.name -}}
 
   trigger.on-deployed-dispatch: |
-    - when: app.status.operationState.phase == 'Succeeded' &&
-            app.status.sync.status == 'Synced' &&
-            app.status.health.status == 'Healthy'
-      oncePer: app.status.operationState.finishedAt
+    - when: app.status.operationState != nil
+            && app.status.operationState.phase == 'Succeeded'
+            && app.status.health.status == 'Healthy'
+      oncePer: app.status.sync.revision
       send: [dispatch-repo-event]
 
  
