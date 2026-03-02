@@ -4,7 +4,13 @@ metadata:
   name: svc-b
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: svc-b
   template:
+    metadata:
+      labels:
+        app: svc-b
     spec:
       containers:
       - name: svc-b
