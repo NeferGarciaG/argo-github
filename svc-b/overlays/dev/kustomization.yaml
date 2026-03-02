@@ -3,3 +3,7 @@ kind: Kustomization
 
 resources:
   - ../../base
+
+images:
+  - name: nggarciag/workshop
+    newTag: "1.0.0"
