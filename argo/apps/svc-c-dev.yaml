@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: svc-c-dev
+  namespace: argocd
+  labels:
+    env: dev
+  annotations:
+    notifications.argoproj.io/subscribe.on-deployed-dispatch.github-dispatch: ""
+    notify.github.owner: "NeferGarciaG"
+    notify.github.repo: "trigger-repo-3"
+    notify.github.event_type: argo_deploy
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/NeferGarciaG/argo-github.git
+    targetRevision: main
+    path: svc-c/overlays/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
