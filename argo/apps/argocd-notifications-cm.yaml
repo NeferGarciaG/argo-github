@@ -85,14 +85,18 @@
 
 # #argo-notifications-cm.yaml
 
+# ConfigMap that defines the notification template and webhook service used to fire
+# GitHub repository_dispatch events whenever an Argo CD Application finishes healthy.
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: argocd-notifications-cm
   namespace: argocd
 data:
+  # Exposed to templates so we can construct deep links back to the Argo CD UI.
   context: |
     argocdUrl: https://localhost:8080
+  # GitHub service definition consumed by the notifications controller.
   service.webhook.github-dispatch: |
     url: https://api.github.com
     headers:
@@ -104,11 +108,13 @@ data:
       value: 2022-11-28
     - name: Content-Type
       value: application/json
+  # Template expects each Application to provide notify.github.* annotations.
   template.dispatch-repo-event: |
     webhook:
       github-dispatch:
         method: POST
         path: /repos/{{ index .app.metadata.annotations "notify.github.owner" }}/{{ index .app.metadata.annotations "notify.github.repo" }}/dispatches
+        # Rendered JSON includes annotation-derived metadata so GitHub Actions can react.
         body: |
           {{- $eventType := index .app.metadata.annotations "notify.github.event_type" -}}
           {{- $env := index .app.metadata.labels "env" -}}
