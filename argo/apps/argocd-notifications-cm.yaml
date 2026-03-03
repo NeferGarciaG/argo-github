@@ -40,7 +40,8 @@ data:
           ) -}}
           {{ toJson $payload }}
   trigger.on-deployed-dispatch: |
-    - when: app.status.health.status == 'Healthy'
-            && app.status.sync.status == 'Synced'
-      oncePer: app.status.sync.revision
+    - when: app.status.operationState != nil
+            && app.status.operationState.phase == 'Succeeded'
+            && app.status.health.status == 'Healthy'
+      oncePer: app.status.operationState.syncResult.revision
       send: [dispatch-repo-event]
