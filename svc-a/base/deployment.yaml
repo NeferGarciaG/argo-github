@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: svc-a
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: svc-a
+  template:
+    metadata:
+      labels:
+        app: svc-a
+    spec:
+      containers:
+      - name: svc-a
+        image: "nggarciag/workshop:latest"
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "16Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"

@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: svc-b-dev
+  name: svc-a-dev
   namespace: argocd
   labels:
     env: dev
@@ -15,7 +15,7 @@ spec:
   source:
     repoURL: https://github.com/NeferGarciaG/argo-github.git
     targetRevision: main
-    path: svc-b/overlays/dev
+    path: svc-a/overlays/dev
   destination:
     server: https://kubernetes.default.svc
     namespace: dev
