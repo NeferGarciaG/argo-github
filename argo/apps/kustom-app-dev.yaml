@@ -10,8 +10,8 @@ metadata:
     # Subscribes this app to the shared github-dispatch webhook when sync + health succeed.
     notifications.argoproj.io/subscribe.on-deployed-dispatch.github-dispatch: ""
     # GitHub repository that should receive the repository_dispatch event from this app.
-    notify.github.owner: "NeferGarciaG"
-    notify.github.repo: "trigger-repo"
+    notify.github.owner: "NeferGarciaG" # organization
+    notify.github.repo: "trigger-repo" # Real Pipeline
     notify.github.event_type: argo_deploy
 
 spec:
