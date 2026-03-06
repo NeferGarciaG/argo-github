@@ -6,4 +6,4 @@ resources:
 
 images:
   - name: nggarciag/workshop
-    newTag: "2.0.0"
+    newTag: "1.0.0"
