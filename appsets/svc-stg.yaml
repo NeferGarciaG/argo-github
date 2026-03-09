@@ -16,6 +16,7 @@ spec:
           - service: svc-a
           - service: svc-b
           - service: svc-c
+          - service: svc-d
   template:
     metadata:
       name: '{{service}}-stg'

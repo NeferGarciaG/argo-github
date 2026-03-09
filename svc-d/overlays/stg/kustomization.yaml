@@ -4,6 +4,8 @@ kind: Kustomization
 resources:
   - ../../base
 
+namespace: stg
+
 images:
   - name: nggarciag/workshop
     newTag: "2.0.0"
