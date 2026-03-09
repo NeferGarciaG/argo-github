@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: argocd-notifications
+  namespace: argocd
+spec:
+  generators:
+  - clusters:
+      selector:
+        matchLabels:
+          argocd-notifications: enabled   # mismo patrón que k6-operator, grafana, etc.
+  template:
+    metadata:
+      name: 'argocd-notifications-{{name}}'
+      annotations:
+        argocd.argoproj.io/manifest-generate-paths: /argo-config/argocd-notifications
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/NeferGarciaG/argo-github.git
+        targetRevision: main
+        path: argo-config/argocd-notifications
+      destination:
+        name: '{{name}}'
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true

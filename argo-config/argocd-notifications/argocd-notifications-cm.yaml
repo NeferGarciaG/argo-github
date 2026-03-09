@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+  namespace: argocd
+data:
+  context: |
+    argocdUrl: https://localhost:9090
+  service.webhook.github-dispatch: |
+    url: https://api.github.com
+    headers:
+    - name: Authorization
+      value: Bearer $github-token
+    - name: Accept
+      value: application/vnd.github+json
+    - name: X-GitHub-Api-Version
+      value: 2022-11-28
+    - name: Content-Type
+      value: application/json
+  template.dispatch-repo-event: |
+    webhook:
+      github-dispatch:
+        method: POST
+        path: /repos/{{ index .app.metadata.annotations "notify.github.owner" }}/{{ index .app.metadata.annotations "notify.github.repo" }}/dispatches
+        body: |
+          {{- $eventType := index .app.metadata.annotations "notify.github.event_type" -}}
+          {{- $env := index .app.metadata.labels "env" -}}
+          {{- $payload := dict "event_type" $eventType "client_payload" (dict
+                "app" .app.metadata.name
+                "env" $env
+                "revision" .app.status.sync.revision
+                "health" .app.status.health.status
+                "argo_link" (printf "%s/applications/%s/%s" .context.argocdUrl .app.metadata.namespace .app.metadata.name)
+          ) -}}
+          {{ toJson $payload }}
+  trigger.on-deployed-dispatch: |
+    - when: app.status.operationState != nil
+            && app.status.operationState.phase == 'Succeeded'
+            && app.status.health.status == 'Healthy'
+      oncePer: app.status.operationState.syncResult.revision
+      send: [dispatch-repo-event]
