@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: svc-stg
+  namespace: argocd
+spec:
+  generators:
+  - matrix:
+      generators:
+      - clusters:
+          selector:
+            matchLabels:
+              cde-stg: enabled        # simula north-virginia-cde en producción
+      - list:
+          elements:
+          - service: svc-a
+          - service: svc-b
+          - service: svc-c
+  template:
+    metadata:
+      name: '{{service}}-stg'
+      annotations:
+        notifications.argoproj.io/subscribe.on-deployed-dispatch.github-dispatch: ""
+        notify.github.owner: "NeferGarciaG"
+        notify.github.repo: "trigger-repo"
+        notify.github.event_type: argo_deploy
+      labels:
+        env: stg
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/NeferGarciaG/argo-github.git
+        targetRevision: main
+        path: '{{service}}/overlays/stg'
+      destination:
+        name: '{{name}}'              # nombre del cluster registrado en ArgoCD
+        namespace: stg
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+        - CreateNamespace=true
