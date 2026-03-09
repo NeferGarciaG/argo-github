@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: svc-c
+  name: svc-d
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: svc-c
+      app: svc-d
   template:
     metadata:
       labels:
-        app: svc-c
+        app: svc-d
     spec:
       containers:
-      - name: svc-c
+      - name: svc-d
         image: "nggarciag/workshop:latest"
         ports:
         - containerPort: 80
