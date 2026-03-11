@@ -8,4 +8,4 @@ namespace: stg
 
 images:
   - name: nggarciag/workshop
-    newTag: "1.0.0"
+    newTag: "2.0.0"
